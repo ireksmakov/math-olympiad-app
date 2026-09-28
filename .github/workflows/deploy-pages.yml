@@ -46,6 +46,7 @@ jobs:
             exit 1
           fi
           APP_DIR=$(dirname "$APP_PACKAGE")
+          chmod -R u+rwX "$APP_DIR"
           echo "Application found in: $APP_DIR"
           echo "APP_DIR=$APP_DIR" >> "$GITHUB_ENV"
 
