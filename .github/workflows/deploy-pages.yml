@@ -1,0 +1,118 @@
+name: Deploy Math Olympiad to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'math-olympiad-app.zip'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Unpack application
+        shell: bash
+        run: |
+          test -f math-olympiad-app.zip || (echo 'Upload math-olympiad-app.zip to the repository first' && exit 1)
+          rm -rf site
+          mkdir site
+          unzip -q math-olympiad-app.zip -d site
+          if [ -f site/math-olympiad-app/package.json ]; then
+            APP_DIR=site/math-olympiad-app
+          elif [ -f site/package.json ]; then
+            APP_DIR=site
+          else
+            echo 'package.json was not found in the ZIP archive'
+            exit 1
+          fi
+          echo "APP_DIR=$APP_DIR" >> "$GITHUB_ENV"
+
+      - name: Prepare Next.js for static GitHub Pages
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ['APP_DIR'])
+
+          task = root / 'app/task/[id]/page.tsx'
+          text = task.read_text(encoding='utf-8')
+          text = text.replace(
+              "import {notFound} from 'next/navigation';import {getProblem} from '@/lib/problems';import SolvePanel from '@/components/SolvePanel';",
+              "import {notFound} from 'next/navigation';import {getProblem,problems} from '@/lib/problems';import SolvePanel from '@/components/SolvePanel';\nexport const dynamicParams=false;\nexport function generateStaticParams(){return problems.map(p=>({id:String(p.id)}));}"
+          )
+          task.write_text(text, encoding='utf-8')
+
+          tasks = root / 'app/tasks/page.tsx'
+          text = tasks.read_text(encoding='utf-8')
+          text = text.replace(
+              "import {useSearchParams} from 'next/navigation';import {useMemo,useState} from 'react';",
+              "import {useEffect,useMemo,useState} from 'react';"
+          )
+          text = text.replace(
+              "export default function Tasks(){const sp=useSearchParams();const[grade,setGrade]=useState(sp.get('grade')||'');",
+              "export default function Tasks(){const[grade,setGrade]=useState('');useEffect(()=>{const g=new URLSearchParams(window.location.search).get('grade');if(g)setGrade(g)},[]);"
+          )
+          tasks.write_text(text, encoding='utf-8')
+
+          (root / 'next.config.mjs').write_text("""const nextConfig = {
+            output: 'export',
+            trailingSlash: true,
+            images: { unoptimized: true },
+            basePath: '/math-olympiad-app',
+            assetPrefix: '/math-olympiad-app/',
+          };
+          export default nextConfig;
+          """, encoding='utf-8')
+          PY
+
+      - name: Install dependencies
+        working-directory: ${{ env.APP_DIR }}
+        run: npm install --no-audit --no-fund
+
+      - name: Build static site
+        working-directory: ${{ env.APP_DIR }}
+        run: npm run build
+
+      - name: Disable Jekyll
+        shell: bash
+        run: touch "${APP_DIR}/out/.nojekyll"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.APP_DIR }}/out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
