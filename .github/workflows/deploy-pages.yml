@@ -39,14 +39,14 @@ jobs:
           rm -rf site
           mkdir site
           unzip -q math-olympiad-app.zip -d site
-          if [ -f site/math-olympiad-app/package.json ]; then
-            APP_DIR=site/math-olympiad-app
-          elif [ -f site/package.json ]; then
-            APP_DIR=site
-          else
+          APP_PACKAGE=$(find site -type f -name package.json | head -n 1)
+          if [ -z "$APP_PACKAGE" ]; then
             echo 'package.json was not found in the ZIP archive'
+            find site -maxdepth 4 -type f | sort | head -n 100
             exit 1
           fi
+          APP_DIR=$(dirname "$APP_PACKAGE")
+          echo "Application found in: $APP_DIR"
           echo "APP_DIR=$APP_DIR" >> "$GITHUB_ENV"
 
       - name: Prepare Next.js for static GitHub Pages
