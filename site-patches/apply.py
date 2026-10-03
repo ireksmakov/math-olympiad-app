@@ -36,4 +36,17 @@ text = text.replace('<div className="statBig">30</div><div>проверенны�
 text = text.replace('Сейчас полностью наполнены 5–7 классы', 'Сейчас активно наполняются 5–7 классы')
 home.write_text(text, encoding='utf-8')
 
-print('Патч применён: содержание 6–7 классов и задачи №31–50.')
+# 5. Кнопка возврата на странице каждой задачи.
+task = root / 'app/task/[id]/page.tsx'
+text = task.read_text(encoding='utf-8')
+if "import Link from 'next/link';" not in text:
+    text = "import Link from 'next/link';\n" + text
+if 'Назад к задачам' not in text:
+    marker = '<section className="problemMain"><div className="small muted">'
+    replacement = '<section className="problemMain"><div style={{marginBottom:18}}><Link className="btn secondary" href="/tasks">← Назад к задачам</Link></div><div className="small muted">'
+    if marker not in text:
+        raise RuntimeError('Не найдено место для кнопки возврата на странице задачи')
+    text = text.replace(marker, replacement, 1)
+task.write_text(text, encoding='utf-8')
+
+print('Патч применён: содержание 6–7 классов, задачи №31–50 и кнопка возврата.')
