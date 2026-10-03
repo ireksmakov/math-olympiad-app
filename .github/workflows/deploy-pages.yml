@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'math-olympiad-app.zip'
+      - 'site-patches/**'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -89,6 +90,10 @@ jobs:
           export default nextConfig;
           """, encoding='utf-8')
           PY
+
+      - name: Apply project content patches
+        shell: bash
+        run: python site-patches/apply.py
 
       - name: Install dependencies
         working-directory: ${{ env.APP_DIR }}
