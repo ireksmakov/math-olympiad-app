@@ -49,4 +49,33 @@ if 'Назад к задачам' not in text:
     text = text.replace(marker, replacement, 1)
 task.write_text(text, encoding='utf-8')
 
-print('Патч применён: содержание 6–7 классов, задачи №31–50 и кнопка возврата.')
+# 6. Интерактивная доска: решение показывается по шагам.
+board_src = repo / 'site-patches/SolutionBoard.tsx'
+board_dst = root / 'components/SolutionBoard.tsx'
+board_dst.write_text(board_src.read_text(encoding='utf-8'), encoding='utf-8')
+
+solve = root / 'components/SolvePanel.tsx'
+text = solve.read_text(encoding='utf-8')
+if "import SolutionBoard from '@/components/SolutionBoard';" not in text:
+    text = text.replace("'use client';\n", "'use client';\nimport SolutionBoard from '@/components/SolutionBoard';\n", 1)
+text = text.replace("{showSolution?'Скрыть решение':'Показать решение'}", "{showSolution?'Скрыть доску':'Показать решение на доске'}")
+text = text.replace('<div className="solution">{problem.solution}</div>', '<SolutionBoard solution={problem.solution}/>')
+solve.write_text(text, encoding='utf-8')
+
+# 7. Оформление интерактивной доски.
+css = root / 'app/globals.css'
+text = css.read_text(encoding='utf-8')
+if '.solutionBoard{' not in text:
+    text += '''\n.solutionBoard{margin-top:18px;border:1px solid #1f4264;border-radius:18px;overflow:hidden;background:#102a43;color:#f5fbff;box-shadow:0 10px 28px rgba(16,42,67,.16)}
+.solutionBoardHead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 20px;background:linear-gradient(135deg,#173f5f,#102a43);border-bottom:1px solid rgba(255,255,255,.14)}
+.solutionBoardTitle{font-size:18px;font-weight:900}.solutionBoardSub{font-size:13px;color:#c9d9e7;margin-top:4px}.solutionBoardCounter{min-width:58px;text-align:center;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:800}
+.solutionBoardScreen{min-height:180px;padding:22px 20px;background:radial-gradient(circle at 20% 10%,rgba(255,255,255,.055),transparent 35%),#0d2438}
+.solutionBoardEmpty{color:#bad0df;padding:34px 6px;text-align:center}.solutionStep{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;padding:10px 0;line-height:1.6;animation:boardStepIn .28s ease-out}.solutionStep+.solutionStep{border-top:1px dashed rgba(255,255,255,.13)}
+.solutionStepNo{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#2f67f6;color:white;font-weight:900}.solutionBoardDone{margin-top:14px;color:#8ee6ba;font-weight:800}
+.solutionBoardControls{display:flex;gap:9px;flex-wrap:wrap;padding:14px 16px;background:#f7faff}.solutionBoardControls .btn{font-size:13px}.solutionBoardControls .btn.secondary{background:white}.solutionBoardControls .btn.ghost{background:#e8eef5}
+@keyframes boardStepIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:620px){.solutionBoardHead{flex-direction:column}.solutionBoardControls .btn{flex:1 1 46%}.solutionBoardScreen{padding:18px 14px}}
+'''
+    css.write_text(text, encoding='utf-8')
+
+print('Патч применён: содержание, задачи №31–50, кнопка возврата и интерактивная доска решения.')
