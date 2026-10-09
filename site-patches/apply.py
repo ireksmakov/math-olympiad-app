@@ -36,7 +36,15 @@ text = text.replace('<div className="statBig">30</div><div>проверенны�
 text = text.replace('Сейчас полностью наполнены 5–7 классы', 'Сейчас активно наполняются 5–7 классы')
 home.write_text(text, encoding='utf-8')
 
-# 5. Страница каждой задачи: кнопка возврата и белая доска справа.
+# 5. В каталоге задач последние добавленные задачи №101–120 отмечаем зелёной точкой.
+tasks_page = root / 'app/tasks/page.tsx'
+text = tasks_page.read_text(encoding='utf-8')
+new_title = '{p.id>=101&&p.id<=120&&<span className="newTaskDot" title="Новая задача"></span>}{p.title}'
+if 'newTaskDot' not in text and '{p.title}' in text:
+    text = text.replace('{p.title}', new_title)
+tasks_page.write_text(text, encoding='utf-8')
+
+# 6. Страница каждой задачи: кнопка возврата, метка новой задачи и белая доска справа.
 whiteboard_src = repo / 'site-patches/WhiteBoard.tsx'
 whiteboard_dst = root / 'components/WhiteBoard.tsx'
 whiteboard_dst.write_text(whiteboard_src.read_text(encoding='utf-8'), encoding='utf-8')
@@ -53,6 +61,8 @@ if 'Назад к задачам' not in text:
     if marker not in text:
         raise RuntimeError('Не найдено место для кнопки возврата на странице задачи')
     text = text.replace(marker, replacement, 1)
+if '<h1>{p.title}</h1>' in text:
+    text = text.replace('<h1>{p.title}</h1>', '<h1>{p.id>=101&&p.id<=120&&<span className="newTaskDot" title="Новая задача"></span>}{p.title}</h1>', 1)
 if '<WhiteBoard problemId={p.id}/>' not in text:
     marker = '<aside className="problemSide">'
     if marker not in text:
@@ -60,7 +70,7 @@ if '<WhiteBoard problemId={p.id}/>' not in text:
     text = text.replace(marker, '<aside className="problemSide"><WhiteBoard problemId={p.id}/>', 1)
 task.write_text(text, encoding='utf-8')
 
-# 6. Оформление: задача и белая доска занимают по половине рабочей области.
+# 7. Оформление: задача и белая доска занимают по половине рабочей области.
 css = root / 'app/globals.css'
 text = css.read_text(encoding='utf-8')
 text = text.replace(
@@ -74,6 +84,8 @@ if '.whiteBoard{' not in text:
 .whiteBoardCanvasWrap{height:560px;border:1px solid #d9e1ec;border-radius:14px;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1px rgba(0,0,0,.012)}.whiteBoardCanvas{display:block;width:100%;height:100%;background:#fff;cursor:crosshair;touch-action:none}.whiteBoardNote{font-size:12px;color:var(--muted);margin-top:9px}
 @media(max-width:900px){.whiteBoardCanvasWrap{height:430px}.whiteBoard{order:1}.problemMain{order:2}}
 '''
+if '.newTaskDot{' not in text:
+    text += '''\n.newTaskDot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.14);margin-right:8px;vertical-align:middle;flex:0 0 auto}\n'''
 css.write_text(text, encoding='utf-8')
 
-print('Патч применён: содержание, задачи №31–50, кнопка возврата и белая доска для черновика.')
+print('Патч применён: расширенный банк задач, зелёная метка новых задач №101–120, кнопка возврата и белая доска.')
