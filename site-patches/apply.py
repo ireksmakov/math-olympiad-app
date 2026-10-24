@@ -36,10 +36,10 @@ text = text.replace('<div className="statBig">30</div><div>проверенны�
 text = text.replace('Сейчас полностью наполнены 5–7 классы', 'Сейчас активно наполняются 5–7 классы')
 home.write_text(text, encoding='utf-8')
 
-# 5. В каталоге задач последние добавленные задачи №101–120 отмечаем зелёной точкой.
+# 5. В каталоге задач последние добавленные задачи №121–130 отмечаем зелёной точкой.
 tasks_page = root / 'app/tasks/page.tsx'
 text = tasks_page.read_text(encoding='utf-8')
-new_title = '{p.id>=101&&p.id<=120&&<span className="newTaskDot" title="Новая задача"></span>}{p.title}'
+new_title = '{p.id>=121&&p.id<=130&&<span className="newTaskDot" title="Новая задача"></span>}{p.title}'
 if 'newTaskDot' not in text and '{p.title}' in text:
     text = text.replace('{p.title}', new_title)
 tasks_page.write_text(text, encoding='utf-8')
@@ -62,7 +62,7 @@ if 'Назад к задачам' not in text:
         raise RuntimeError('Не найдено место для кнопки возврата на странице задачи')
     text = text.replace(marker, replacement, 1)
 if '<h1>{p.title}</h1>' in text:
-    text = text.replace('<h1>{p.title}</h1>', '<h1>{p.id>=101&&p.id<=120&&<span className="newTaskDot" title="Новая задача"></span>}{p.title}</h1>', 1)
+    text = text.replace('<h1>{p.title}</h1>', '<h1>{p.id>=121&&p.id<=130&&<span className="newTaskDot" title="Новая задача"></span>}{p.title}</h1>', 1)
 if '<WhiteBoard problemId={p.id}/>' not in text:
     marker = '<aside className="problemSide">'
     if marker not in text:
@@ -88,4 +88,4 @@ if '.newTaskDot{' not in text:
     text += '''\n.newTaskDot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.14);margin-right:8px;vertical-align:middle;flex:0 0 auto}\n'''
 css.write_text(text, encoding='utf-8')
 
-print('Патч применён: расширенный банк задач, зелёная метка новых задач №101–120, кнопка возврата и белая доска.')
+print('Патч применён: расширенный банк задач, зелёная метка новых задач №121–130, кнопка возврата и белая доска.')
