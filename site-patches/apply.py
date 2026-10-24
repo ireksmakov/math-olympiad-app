@@ -44,6 +44,17 @@ if 'newTaskDot' not in text and '{p.title}' in text:
     text = text.replace('{p.title}', new_title)
 tasks_page.write_text(text, encoding='utf-8')
 
+# Карточки каталога вынесены в отдельный компонент: отмечаем новые задачи и там.
+for card_component in (root / 'components').glob('*.tsx'):
+    card_text = card_component.read_text(encoding='utf-8')
+    marker = '<h3>{p.title}</h3>'
+    if marker in card_text:
+        card_text = card_text.replace(
+            marker,
+            '<h3>{p.id>=121&&p.id<=130&&<span className="newTaskDot" title="Новая задача"></span>}{p.title}</h3>'
+        )
+        card_component.write_text(card_text, encoding='utf-8')
+
 # 6. Страница каждой задачи: кнопка возврата, метка новой задачи и белая доска справа.
 whiteboard_src = repo / 'site-patches/WhiteBoard.tsx'
 whiteboard_dst = root / 'components/WhiteBoard.tsx'
@@ -88,4 +99,4 @@ if '.newTaskDot{' not in text:
     text += '''\n.newTaskDot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.14);margin-right:8px;vertical-align:middle;flex:0 0 auto}\n'''
 css.write_text(text, encoding='utf-8')
 
-print('Патч применён: расширенный банк задач, зелёная метка новых задач №121–130, кнопка возврата и белая доска.')
+print('Патч применён: расширенный банк задач, зелёная метка новых задач №121–130 в каталоге и на странице задачи, кнопка возврата и белая доска.')
