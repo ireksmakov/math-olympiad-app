@@ -4,10 +4,10 @@ const E=require('../app.js');
 let checks=0;
 function eq(a,b,message){assert.ok(Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<1e-5,message+` (${a} ≠ ${b})`);checks++}
 function derivative(f,x){const d=1e-5;return(f(x+d)-f(x-d))/(2*d)}
-assert.equal(E.TEMPLATES.length,28);
-assert.equal(E.TEMPLATES.filter(t=>t.exam==='oge').length,14);
+assert.equal(E.TEMPLATES.length,36);
+assert.equal(E.TEMPLATES.filter(t=>t.exam==='oge').length,22);
 assert.equal(E.TEMPLATES.filter(t=>t.exam==='ege').length,14);
-assert.deepEqual(new Set(E.TEMPLATES.map(t=>t.id)).size,28);
+assert.deepEqual(new Set(E.TEMPLATES.map(t=>t.id)).size,36);
 assert.equal(E.parseAnswer('−3,5'),-3.5);
 assert.equal(E.parseAnswer('3/2'),1.5);
 assert.equal(E.parseAnswer('2/0'),null);
@@ -21,7 +21,11 @@ for(const t of E.TEMPLATES){
   const x=E.makeTask(t.id,seed), f=x.chart.functions[0]?.fn;
   assert.equal(x.id,t.id);assert.equal(x.exam,t.exam);assert.equal(x.level,t.level);
   assert.ok(x.formula&&x.prompt&&x.hint&&x.solution&&x.chart);
-  if(x.format==='points'){
+  if(x.format==='matching'){
+   const m=x.matching, key={16:312,17:213,18:213,19:312,20:231,22:312,23:123,322008:413};
+   assert.equal(x.answer,key[m.n]);assert.equal(m.lines.length,3);assert.ok([3,4].includes(m.options.length));
+   assert.equal(new Set(String(x.answer)).size,3);assert.equal(x.seed,0);
+  }else if(x.format==='points'){
    assert.equal(x.targets.length,2);
    assert.ok(E.isPointsCorrect(x.targets,x.targets));
    for(const p of x.targets){eq(x.solutionFunctions[0].fn(p.x),p.y,`${t.id} point @${seed}`)}
