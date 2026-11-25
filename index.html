@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#eaf6ff" />
+  <meta name="description" content="ГРАФИКА — интерактивный тренажёр графиков функций для ОГЭ и профильного ЕГЭ: задания, автоматическая проверка, статистика и теория." />
+  <title>ГРАФИКА — тренажёр графиков ОГЭ и ЕГЭ</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Навигация">
+      <a href="#home" class="brand" data-nav="home" aria-label="ГРАФИКА — главная">
+        <span class="brand-mark"><svg viewBox="0 0 34 34" fill="none" aria-hidden="true"><path d="M5 25.5H29M8.5 29V6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 22.5C14 22 14 7 20 9S23 25 29 15" stroke="#fff" stroke-width="2.7" stroke-linecap="round"/></svg></span>
+        <span>ГРАФИКА<span class="brand-dot">.</span><small>Математика наглядно</small></span>
+      </a>
+      <div class="nav-caption">ОБУЧЕНИЕ</div>
+      <nav class="navigation" id="navigation">
+        <button data-nav="home" class="nav-item active"><span class="nav-icon">⌂</span> Главная</button>
+        <button data-nav="practice" class="nav-item"><span class="nav-icon">▦</span> Тренажёр <span class="nav-tag">NEW</span></button>
+        <button data-nav="lab" class="nav-item"><span class="nav-icon">⌁</span> Лаборатория</button>
+        <button data-nav="theory" class="nav-item"><span class="nav-icon">▤</span> Теория</button>
+      </nav>
+      <div class="nav-caption second">ВАШ ПРОГРЕСС</div>
+      <nav class="navigation">
+        <button data-nav="statistics" class="nav-item"><span class="nav-icon">◫</span> Статистика</button>
+        <button data-nav="mistakes" class="nav-item"><span class="nav-icon">↻</span> Мои ошибки <span id="mistakeCount" class="side-count">0</span></button>
+        <button data-nav="favorites" class="nav-item"><span class="nav-icon">♡</span> Избранное</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="goal-card"><div class="goal-heading"><span>✦ Цель на сегодня</span><strong id="goalCount">0/5</strong></div><div class="progress-track"><span id="goalBar"></span></div><p>5 верных решений в день — маленький шаг к высокому баллу.</p></div>
+        <div class="sidebar-foot">✧ Создано для уверенной подготовки<br /><span>ОГЭ • ЕГЭ профиль</span></div>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-location"><span class="mobile-logo">ГРАФИКА<span class="brand-dot">.</span></span><span class="breadcrumb">Платформа подготовки</span><span class="chevron">/</span><strong id="pageLabel">Главная</strong></div>
+        <div class="topbar-right"><span class="topbar-chip" id="headerStreak">⚡ 0 дней</span><span class="topbar-chip points" id="headerXP">✦ 0 XP</span><span class="user-avatar" title="Личный кабинет без регистрации">У</span></div>
+      </header>
+      <main id="main" class="main-content" tabindex="-1"></main>
+      <footer class="site-footer"><span>ГРАФИКА · Обучающая платформа</span><span>Авторские задания по типам ФИПИ · <a href="https://fipi.ru/oge/otkrytyy-bank-zadaniy-oge" target="_blank" rel="noopener">ОГЭ</a> · <a href="https://fipi.ru/ege/otkrytyy-bank-zadaniy-ege" target="_blank" rel="noopener">ЕГЭ</a></span></footer>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
